@@ -46,15 +46,19 @@
 </template>
 
 <script>
-import { reactive, toRefs} from "vue";
+import {reactive, toRefs} from "vue";
 import api from "@/axios/api";
 import {ElMessage} from "element-plus";
 import router from "@/router";
-import cookie from "vue-cookie";
+import { useCookies } from 'vue3-cookies';
+
+
+
 
 export default {
   name: "toLogin",
   setup(){
+    const {cookies} = useCookies();
     let obj = reactive({
       username: null,
       password: null,
@@ -66,7 +70,7 @@ export default {
               message: '登录成功！',
               type: 'success'
             })
-            cookie.set("userId",res.data.id)
+            cookies.set("token", res.data, "1d")
             router.push("/toIndex")
           }else{
             ElMessage({

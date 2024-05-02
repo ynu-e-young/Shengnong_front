@@ -1,5 +1,5 @@
 {
-  "name": "ylzc_front",
+  "name": "shengnong_frontent",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,19 +8,25 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.0.10",
+    "@element-plus/icons-vue": "^2.3.1",
+    "@icon-park/vue-next": "^1.4.2",
     "axios": "^1.2.2",
     "core-js": "^3.8.3",
     "echarts": "^5.4.1",
+    "element-china-area-data": "^6.1.0",
     "element-plus": "^2.2.28",
     "flv.js": "^1.6.2",
+    "sass": "^1.76.0",
+    "sass-loader": "^14.2.1",
+    "swiper": "^11.1.1",
     "video.js": "^7.21.2",
     "videojs-contrib-hls": "^5.15.0",
     "videojs-flash": "^2.2.1",
     "vue": "^3.2.13",
-    "vue-cookie": "^1.1.4",
     "vue-router": "^4.1.6",
-    "vue-video-player": "^6.0.0"
+    "vue-video-player": "^6.0.0",
+    "vue3-cookies": "^1.0.6",
+    "vue3-lazyload": "^0.3.8"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

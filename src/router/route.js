@@ -24,6 +24,10 @@ const routes = [
                 redirect: "/toList"
             }
         ]
+    },{
+        name: "toMine",
+        path: "/toMine",
+        component:() => import("@/components/toMine")
     }
 ];
 

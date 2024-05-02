@@ -2,64 +2,30 @@
 
   <el-main style="width: 100%;height: 90%">
 
-    <!--作废-->
-    <!--<el-row gutter="20">-->
-
-    <!--  <el-button type="primary" @click="beforeCreate" style="margin: 0 20px">-->
-    <!--    新增机器-->
-    <!--  </el-button>-->
-
-    <!--  <el-button type="success">-->
-    <!--    关联机器-->
-    <!--  </el-button>-->
-
-    <!--</el-row>-->
-
-    <!--<el-divider/>-->
-
-    <!--<el-dialog-->
-    <!--    v-model="dialogVisible1"-->
-    <!--    title="新建机器"-->
-    <!--    width="50%"-->
-    <!--&gt;-->
-    <!--  <el-input placeholder="机器名" style="margin: 20px 0 0 0"/>-->
-
-    <!--  <el-input placeholder="机器类名" style="margin: 20px 0"/>-->
-
-    <!--  <template #footer>-->
-
-    <!--    <span class="dialog-footer">-->
-
-    <!--      <el-button @click="dialogVisible1 = false">取消</el-button>-->
-
-    <!--      <el-button type="primary" @click="toCreate">-->
-    <!--        提交-->
-    <!--      </el-button>-->
-
-    <!--    </span>-->
-
-    <!--  </template>-->
-    <!--</el-dialog>-->
-
     <el-table style="width: 100%;height:100%;justify-content: center" :data="tableData" stripe border>
 
-      <el-table-column label="创建日期" prop="createdDate" fixed width="350px"/>
+      <el-table-column type="index" label="序号" fixed width="80" />
 
-      <el-table-column label="最后一次修改日期" prop="lastModifiedDate" width="350px"/>
+      <el-table-column label="机器名" prop="customName" fixed width="200" />
 
-      <el-table-column label="机器名" prop="customName" width="350px"/>
+      <el-table-column label="类型名" prop="typeName" width="200" />
 
-      <el-table-column label="类型名" prop="typeName" width="350px"/>
+      <el-table-column label="创建日期" prop="createdDate" width="180" />
+
+      <el-table-column label="最后一次修改日期" prop="lastModifiedDate" width="180" />
 
       <el-table-column label="操作" fixed="right" width="215px">
 
-        <template #default>
+        <!-- </el-table-column label="数据量" fixed="right" width="215px"> -->
 
-          <el-button @click="toview('4028818585b0ece90185b0eddac20000')">
+        <template v-slot:default="scope">
+
+          <!-- 把当前这个 device 的 id 传输给 toview -->
+          <el-button @click="toview(scope.row.id)">
             查看机器
           </el-button>
 
-          <el-button @click="toConnect">
+          <el-button @click="toConnect(scope.row.id)">
             关联机器
           </el-button>
 
@@ -75,44 +41,66 @@
 
 <script>
 // eslint-disable-next-line no-unused-vars
-import {onBeforeMount, reactive, toRefs} from "vue";
-import cookie from "vue-cookie";
+import { onBeforeMount, reactive, toRefs, toRaw } from "vue";
 import api from "@/axios/api";
 import router from "@/router";
-import {ElMessage} from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 export default {
   name: "toList",
-  setup(){
+  setup() {
     let obj = reactive({
-      userId: cookie.get("userId"),
-      tableData:[],
-      getMachine: ()=>{
-        api.getAllMachines(obj.userId).then(res=>{
+      tableData: [],
+      getMachine: () => {
+        api.getMachines().then(res => {
           obj.tableData = res.data
         })
       },
-      toview:async (deviceId)=>{
+      toview: async (deviceId) => {
+        // console.log( obj.tableData.find(item => item.id === deviceId))
         let images = []
         await api.getImages(deviceId).then(res => {
           images = res.data
         })
+        // await api.queryDataByDevice(deviceId).then(res => {
+        //   environmentDataList = res.data
+        // })
         router.push({
-          name:"toView",
+          name: "toView",
           state: {
-            images:images
+            images: images,
+            deviceId: deviceId,
+            // 这里 find 的是一个proxy对象，如果切换页面，这个对象会变为 null
+            device: toRaw(obj.tableData.find(item => item.id === deviceId))
           }
         })
       },
-      toCreate:async ()=>{
+      toCreate: async () => {
         await ElMessage({
           message: '提交成功!',
           type: 'success'
         })
-        obj.dialogVisible1=false
+        obj.dialogVisible1 = false
       },
-      beforeCreate:()=>{
-        obj.dialogVisible1=true
+      beforeCreate: () => {
+        obj.dialogVisible1 = true
+      },
+      // toConnect 弹窗显示机器 ID 并提示将该 ID 烧入机器固件，提供复制按钮
+      toConnect: (deviceId) => {
+        ElMessageBox.alert(`请将机器 ID 烧入机器固件：${deviceId}`, '机器 ID', {
+          confirmButtonText: '复制',
+          callback: action => {
+            if (action === 'confirm') {
+              navigator.clipboard.writeText(deviceId).then(() => {
+                ElMessage({
+                  message: '复制成功!',
+                  type: 'success'
+                })
+              })
+            }
+          }
+        })
+
       },
       dialogVisible1: false,
       dialogVisible2: false
@@ -120,16 +108,16 @@ export default {
 
 
 
-    onBeforeMount(()=>{
+    onBeforeMount(() => {
       obj.getMachine()
     })
-    return {...toRefs(obj)}
+    return { ...toRefs(obj) }
   }
 }
 </script>
 
 <style scoped>
-.el-row{
+.el-row {
   margin: 0 0 20px 0;
 }
 </style>
